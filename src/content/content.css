@@ -1,0 +1,29 @@
+/* Base styling for the tag */
+#website-color-tagger-tag {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    border-radius: 4px;
+    z-index: 99999999; /* Ensure it's on top */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    cursor: default; /* Indicate it's not interactive by default */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: none; /* Hidden by default, shown by JS */
+}
+
+/* Hover effect */
+#website-color-tagger-tag:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Optional: Style to slightly push down the body content if needed */
+/* You might need JavaScript to adjust this based on tag height dynamically */
+/* body.website-color-tagger-active {
+    margin-top: 30px;  Adjust based on tag height 
+} */ 

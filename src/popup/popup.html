@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Color Tagger</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Website Color Tagger</h1>
+            <div class="theme-toggle">
+                <label for="theme-switch">Dark Mode</label>
+                <input type="checkbox" id="theme-switch">
+            </div>
+        </header>
+
+        <section class="global-settings">
+            <h2>Global Settings</h2>
+            <div class="setting-item">
+                <label for="global-enable-switch">Enable Extension</label>
+                <input type="checkbox" id="global-enable-switch">
+            </div>
+        </section>
+
+        <section class="current-site-settings">
+            <h2>Current Site (<span id="current-domain">Loading...</span>)</h2>
+            <div class="setting-item">
+                <label for="site-enable-switch">Enable Tag for this Site</label>
+                <input type="checkbox" id="site-enable-switch">
+            </div>
+            <div class="setting-item">
+                <label for="site-label-input">Custom Label</label>
+                <input type="text" id="site-label-input" placeholder="Default (e.g., EX)">
+            </div>
+            <div class="setting-item">
+                <label for="site-color-picker">Tag Color</label>
+                <input type="color" id="site-color-picker">
+                <button id="reset-site-color" class="button-secondary">Reset Color</button>
+            </div>
+             <button id="save-site-settings" class="button-primary">Save Site Settings</button>
+             <button id="reset-site-settings" class="button-secondary">Reset Site</button>
+             <p id="status-message" class="status-message"></p>
+        </section>
+
+        <section class="all-sites-settings">
+            <h2>Configured Sites</h2>
+            <ul id="domain-list"></ul>
+             <button id="reset-all-settings" class="button-danger">Reset All Settings</button>
+        </section>
+
+    </div>
+
+    <script src="../common/utils.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html> 
