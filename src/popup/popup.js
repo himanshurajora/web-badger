@@ -173,16 +173,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const newLabel = siteLabelInput.value.trim();
         const newColor = siteColorPicker.value;
 
+        // Keep a copy of the potentially modified settings object for the current domain
+        const potentialDomainSettings = {
+            enabled: isEnabled,
+            label: newLabel === '' ? null : newLabel, // Store null if empty to use default
+            color: newColor === getDefaultColor(currentDomain) ? null : newColor // Store null if default
+        };
+
         // Only create/update the domain entry if it's enabled or was previously configured
         if (isEnabled || settings.domains[currentDomain]) {
-            settings.domains[currentDomain] = {
-                enabled: isEnabled,
-                label: newLabel === '' ? null : newLabel, // Store null if empty to use default
-                color: newColor === getDefaultColor(currentDomain) ? null : newColor // Store null if default
-            };
              // Clean up entry if disabled and has no custom settings
-            if (!isEnabled && !settings.domains[currentDomain].label && !settings.domains[currentDomain].color) {
-                delete settings.domains[currentDomain];
+            if (!isEnabled && potentialDomainSettings.label === null && potentialDomainSettings.color === null) {
+                 if (settings.domains[currentDomain]) {
+                    delete settings.domains[currentDomain];
+                 }
+                 // If it wasn't previously configured and is disabled, we don't add it below.
+            } else {
+                settings.domains[currentDomain] = potentialDomainSettings;
             }
         } else {
             // If the site was never configured and is being saved in a disabled state, do nothing.
@@ -190,12 +197,40 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        saveSettingsAndUpdate(settings).then(() => {
+        // Make a deep copy to avoid potential issues if the settings object is mutated elsewhere
+        const settingsToSave = JSON.parse(JSON.stringify(settings));
+
+        saveSettingsAndUpdate(settingsToSave).then(() => {
             showStatus("Site settings saved!");
             populateDomainList(); // Update the list immediately
+
+            // --- START IMMEDIATE UPDATE --- 
+            // Directly notify the current active tab to update its tag instantly
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                if (chrome.runtime.lastError) {
+                    console.error("Error querying active tab:", chrome.runtime.lastError.message);
+                    return;
+                }
+                if (tabs && tabs.length > 0 && tabs[0].id) {
+                    const activeTabId = tabs[0].id;
+                    // Send the updated settings directly to the content script of the active tab
+                    chrome.tabs.sendMessage(activeTabId, { action: "settingsUpdated", settings: settingsToSave }, (response) => {
+                        if (chrome.runtime.lastError) {
+                            // This might happen if the content script isn't injected or ready yet, or the page is restricted
+                            // console.warn(`Could not send immediate update to tab ${activeTabId}: ${chrome.runtime.lastError.message}`);
+                        } else {
+                            // console.log("Immediate update message sent to active tab.");
+                        }
+                    });
+                }
+            });
+             // --- END IMMEDIATE UPDATE --- 
+
         }).catch(err => {
             showStatus("Error saving settings", "error");
             console.error("Save error:", err);
+            // Restore previous settings state in the UI potentially?
+            // For now, just log the error.
         });
     });
 
