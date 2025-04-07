@@ -47,8 +47,27 @@ The Website Color Tagger is a standalone browser extension that integrates with 
 - **Configuration Interface**:
   - Global enable/disable toggle
   - Domain-specific enable/disable toggle
-  - Color picker for tag customization
-  - Text input for custom tag labels
+  - **General Settings (Per Domain):**
+    - Color picker for tag background color
+    - Text input for custom tag labels
+    - **Position:** Select dropdown (top-left, top-right, bottom-left, bottom-right)
+    - **Shape:** Select dropdown (rectangle, pill, circle)
+    - **Size:** Input fields for width and height (e.g., px, em)
+    - **Opacity:** Slider or input (0-1)
+  - **Font Settings (Per Domain):**
+    - Font family selection (optional, maybe default web safe fonts)
+    - Font size input (e.g., px, em)
+    - Font weight selection (normal, bold)
+    - Font color picker
+  - **Border Settings (Per Domain):**
+    - Border width input (px)
+    - Border style selection (solid, dashed, dotted)
+    - Border color picker
+    - Border radius input (px or %)
+  - **Effects (Per Domain):**
+    - Background gradient option (e.g., linear gradient, two colors, angle)
+    - Entrance animation selection (none, fade-in, slide-in)
+    - Hover effect selection (none, move-opposite-corner, change-opacity, grow)
   - List of enabled domains with delete options
   - Dark/light theme toggle
   - Reset options (per domain and global)
@@ -62,11 +81,12 @@ The Website Color Tagger is a standalone browser extension that integrates with 
 
 ##### 3.2.1 Tag Display
 - FR-1: Show colored tags on enabled domains when extension is globally enabled
-- FR-2: Position tag at top-left corner of viewport
+- FR-2: Position tag at the configured corner of the viewport (top-left, top-right, bottom-left, bottom-right)
 - FR-3: Generate default tag colors based on domain name hash
 - FR-4: Generate default label from first two letters of domain name
-- FR-5: Support custom text labels and colors
-- FR-6: Add hover effects to tag for improved user interaction
+- FR-5: Support custom text labels, colors, fonts, borders, gradients, and shapes.
+- FR-6: Apply configured animations and hover effects to the tag.
+- FR-6.1: Implement hover effect to move the tag to the diagonally opposite corner if configured.
 
 ##### 3.2.2 Settings Management
 - FR-7: Store and retrieve settings using browser Storage API
@@ -74,6 +94,10 @@ The Website Color Tagger is a standalone browser extension that integrates with 
 - FR-9: Support global extension toggle
 - FR-10: Support dark/light theme preference
 - FR-11: Provide reset functionality for domain and global settings
+- FR-15: Apply configured tag styling (size, shape, fonts, borders, opacity, gradients).
+- FR-16: Apply configured tag positioning.
+- FR-17: Apply configured tag entrance animations.
+- FR-18: Apply configured tag hover effects.
 
 ##### 3.2.3 Communication
 - FR-12: Establish messaging between various components
@@ -116,9 +140,43 @@ The Website Color Tagger is a standalone browser extension that integrates with 
       "domains": {
         "[domain]": {
           "enabled": boolean,
-          "color": string,
-          "label": string
+          "label": string,
+          "position": "top-left" | "top-right" | "bottom-left" | "bottom-right",
+          "shape": "rectangle" | "pill" | "circle",
+          "size": { "width": string, "height": string }, // e.g., "50px", "20px" or "auto"
+          "opacity": number, // 0 to 1
+          "font": {
+            "family": string | null, // Optional
+            "size": string, // e.g., "12px"
+            "weight": "normal" | "bold",
+            "color": string // hex code
+          },
+          "background": {
+            "color": string, // hex code
+            "gradient": { // Optional
+              "enabled": boolean,
+              "color1": string, // hex code
+              "color2": string, // hex code
+              "angle": number // degrees
+            } | null
+          },
+          "border": {
+            "width": number, // px
+            "style": "solid" | "dashed" | "dotted" | "none",
+            "color": string, // hex code
+            "radius": string // e.g., "5px" or "50%"
+          },
+          "effects": {
+            "animation": "none" | "fade-in" | "slide-in",
+            "hover": "none" | "move-opposite-corner" | "change-opacity" | "grow"
+          }
         }
+      },
+      "globalDefaults": { // Optional: Define global defaults to avoid repetition
+        // Same structure as domain settings, applied if domain doesn't override
+        "position": "top-left",
+        "shape": "rectangle",
+        // ... other default style properties
       }
     }
   }
@@ -140,3 +198,6 @@ The Website Color Tagger is a standalone browser extension that integrates with 
 - Support for additional tag positions (top-right, bottom-left, etc.)
 - Tag templates for common environments (dev, staging, prod)
 - Export/import settings functionality
+- More shape options (triangle, custom SVG?)
+- More animation/hover effects
+- Global default settings for styles

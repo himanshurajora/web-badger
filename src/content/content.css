@@ -1,26 +1,184 @@
-/* Base styling for the tag */
-#website-color-tagger-tag {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    padding: 5px 10px;
-    font-size: 12px;
-    font-weight: bold;
-    color: white;
-    border-radius: 4px;
-    z-index: 99999999; /* Ensure it's on top */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    cursor: default; /* Indicate it's not interactive by default */
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    display: none; /* Hidden by default, shown by JS */
+:root {
+    /* Default values - these will be overridden by JS */
+    --wct-bg-color: #ff0000;
+    --wct-bg-gradient: none;
+    --wct-font-color: #ffffff;
+    --wct-font-size: 12px;
+    --wct-font-weight: bold;
+    --wct-font-family: sans-serif;
+    --wct-padding: 5px 10px;
+    --wct-width: auto;
+    --wct-height: auto;
+    --wct-opacity: 1;
+    --wct-border-width: 0px;
+    --wct-border-style: none;
+    --wct-border-color: transparent;
+    --wct-border-radius: 3px;
+    --wct-top: 10px;
+    --wct-right: auto;
+    --wct-bottom: auto;
+    --wct-left: 10px;
+    --wct-transform: none;
+    --wct-hover-transform: translateY(-2px);
+    --wct-hover-opacity: 1;
+    --wct-transition-duration: 0.2s;
 }
 
-/* Hover effect */
-#website-color-tagger-tag:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+/* Base styling for the tag - using CSS variables */
+#website-color-tagger-tag {
+    position: fixed;
+    z-index: 2147483647; /* Max z-index */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: default;
+    display: none; /* Hidden by default, shown by JS */
+    /* Refined transition for better control, especially for position changes */
+    transition: background var(--wct-transition-duration) ease-in-out,
+                color var(--wct-transition-duration) ease-in-out,
+                opacity var(--wct-transition-duration) ease-in-out,
+                transform var(--wct-transition-duration) ease-in-out,
+                top var(--wct-transition-duration) ease-in-out,
+                right var(--wct-transition-duration) ease-in-out,
+                bottom var(--wct-transition-duration) ease-in-out,
+                left var(--wct-transition-duration) ease-in-out,
+                border-radius var(--wct-transition-duration) ease-in-out,
+                box-shadow var(--wct-transition-duration) ease-in-out;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+
+    /* Apply variables */
+    /* We'll let JS directly set the background to ensure it works properly */
+    /* background: var(--wct-bg-gradient, var(--wct-bg-color)); */
+    color: var(--wct-font-color);
+    font-size: var(--wct-font-size);
+    font-weight: var(--wct-font-weight);
+    font-family: var(--wct-font-family);
+    padding: var(--wct-padding);
+    width: var(--wct-width);
+    height: var(--wct-height);
+    opacity: var(--wct-opacity);
+    border-width: var(--wct-border-width);
+    border-style: var(--wct-border-style);
+    border-color: var(--wct-border-color);
+    border-radius: var(--wct-border-radius);
+    top: var(--wct-top);
+    right: var(--wct-right);
+    bottom: var(--wct-bottom);
+    left: var(--wct-left);
+    transform: var(--wct-transform);
 }
+
+/* Positioning Classes (applied by JS) */
+#website-color-tagger-tag.position-top-left {
+    --wct-top: 10px;
+    --wct-right: auto;
+    --wct-bottom: auto;
+    --wct-left: 10px;
+}
+#website-color-tagger-tag.position-top-right {
+    --wct-top: 10px;
+    --wct-right: 10px;
+    --wct-bottom: auto;
+    --wct-left: auto;
+}
+#website-color-tagger-tag.position-bottom-left {
+    --wct-top: auto;
+    --wct-right: auto;
+    --wct-bottom: 10px;
+    --wct-left: 10px;
+}
+#website-color-tagger-tag.position-bottom-right {
+    --wct-top: auto;
+    --wct-right: 10px;
+    --wct-bottom: 10px;
+    --wct-left: auto;
+}
+
+/* Shape Variations (applied by JS) */
+#website-color-tagger-tag.shape-rectangle {
+    /* Default shape, might not need specific rules if border-radius is set */
+}
+#website-color-tagger-tag.shape-pill {
+    --wct-border-radius: 9999px; /* Fully rounded ends */
+}
+#website-color-tagger-tag.shape-circle {
+    --wct-border-radius: 50%;
+    /* Requires width == height, and text centering */
+    display: flex; /* Use flexbox for centering */
+    align-items: center;
+    justify-content: center;
+    padding: 0; /* Override padding for centering */
+    aspect-ratio: 1 / 1; /* Maintain aspect ratio if only one dimension is set */
+    /* Ensure width/height are set appropriately in JS for circle */
+}
+
+/* Entrance Animations (applied by JS) */
+@keyframes wct-fade-in {
+    from { opacity: 0; }
+    to { opacity: var(--wct-opacity); }
+}
+@keyframes wct-slide-in-top {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: var(--wct-opacity); }
+}
+@keyframes wct-slide-in-bottom {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: var(--wct-opacity); }
+}
+@keyframes wct-slide-in-left {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: var(--wct-opacity); }
+}
+@keyframes wct-slide-in-right {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: var(--wct-opacity); }
+}
+
+#website-color-tagger-tag.animate-fade-in {
+    animation: wct-fade-in 0.5s ease-out forwards;
+}
+/* Slide-in direction depends on position */
+#website-color-tagger-tag.animate-slide-in.position-top-left,
+#website-color-tagger-tag.animate-slide-in.position-top-right {
+    animation: wct-slide-in-top 0.5s ease-out forwards;
+}
+#website-color-tagger-tag.animate-slide-in.position-bottom-left,
+#website-color-tagger-tag.animate-slide-in.position-bottom-right {
+    animation: wct-slide-in-bottom 0.5s ease-out forwards;
+}
+/* Example for left/right if needed, but top/bottom seems more common */
+/* #website-color-tagger-tag.animate-slide-in.position-top-left,
+#website-color-tagger-tag.animate-slide-in.position-bottom-left {
+    animation: wct-slide-in-left 0.5s ease-out forwards;
+} */
+
+/* Hover Effects (using CSS variables set by JS or base styles) */
+#website-color-tagger-tag:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly larger shadow on hover */
+}
+
+/* Hover: Move Opposite Corner - Handles completely by JS now */
+
+/* Hover: Change Opacity - direct application for immediate effect */
+#website-color-tagger-tag.hover-change-opacity {
+    transition: opacity 0.2s ease !important; /* Override specific transition for opacity effect */
+}
+#website-color-tagger-tag.hover-change-opacity:hover {
+    opacity: 0.7 !important; /* Override any inline opacity with importance */
+}
+
+/* Hover: Grow - direct application for immediate effect */
+#website-color-tagger-tag.hover-grow {
+    transition: transform 0.2s ease !important; /* Override specific transition for grow effect */
+}
+#website-color-tagger-tag.hover-grow:hover {
+    transform: scale(1.1) !important; /* Override any inline transform with importance */
+}
+
+/* Remove the old reference to opacity/transform in the general hover rule */
+/* #website-color-tagger-tag:hover {
+    transform: var(--wct-hover-transform);
+    opacity: var(--wct-hover-opacity);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+} */
 
 /* Optional: Style to slightly push down the body content if needed */
 /* You might need JavaScript to adjust this based on tag height dynamically */

@@ -30,15 +30,60 @@ function getDefaultLabel(domain) {
     return mainPart.length >= 2 ? mainPart.substring(0, 2).toUpperCase() : mainPart.substring(0, 1).toUpperCase();
 }
 
+// NEW: Function to get default configuration for a domain
+function getDefaultDomainConfig(domain) {
+    return {
+        enabled: false, // Defaults to disabled until explicitly enabled
+        label: getDefaultLabel(domain),
+        position: 'top-left',
+        shape: 'rectangle',
+        size: { width: 'auto', height: 'auto' },
+        opacity: 1,
+        font: {
+            family: 'sans-serif',
+            size: '12px',
+            weight: 'bold',
+            color: '#ffffff' // White text often contrasts well
+        },
+        background: {
+            color: getDefaultColor(domain), // Use the generated default color
+            gradient: {
+                enabled: false,
+                color1: getDefaultColor(domain),
+                color2: '#000000', // Default second color, maybe adjust later
+                angle: 45
+            }
+        },
+        border: {
+            width: 0, // No border by default
+            style: 'none',
+            color: '#000000',
+            radius: '3px' // Slight rounding by default
+        },
+        effects: {
+            animation: 'none',
+            hover: 'none'
+        }
+    };
+}
+
 async function getSettings() {
     return new Promise((resolve) => {
         chrome.storage.sync.get('settings', (data) => {
+            // Define the full default structure
             const defaults = {
                 globalEnabled: true,
                 darkMode: false,
                 domains: {}
+                // We might add globalDefaults here later
             };
-            resolve({ ...defaults, ...(data.settings || {}) });
+            // Merge saved settings with defaults deep enough to ensure domains exist
+            const loadedSettings = { ...defaults, ...(data.settings || {}) };
+            loadedSettings.domains = loadedSettings.domains || {}; // Ensure domains object exists
+
+            // Note: We don't automatically populate default domain configs here.
+            // They are generated when a domain is first accessed/saved via the popup.
+            resolve(loadedSettings);
         });
     });
 }

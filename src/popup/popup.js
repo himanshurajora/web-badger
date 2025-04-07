@@ -5,14 +5,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentDomainSpan = document.getElementById('current-domain');
     const siteEnableSwitch = document.getElementById('site-enable-switch');
     const siteLabelInput = document.getElementById('site-label-input');
-    const siteColorPicker = document.getElementById('site-color-picker');
+    const sitePositionSelect = document.getElementById('site-position-select');
+    const siteShapeSelect = document.getElementById('site-shape-select');
+    const siteSizeWidthInput = document.getElementById('site-size-width');
+    const siteSizeHeightInput = document.getElementById('site-size-height');
+    const siteOpacityInput = document.getElementById('site-opacity-input');
+    const opacityValueSpan = document.getElementById('opacity-value');
+    const siteFontSizeInput = document.getElementById('site-font-size-input');
+    const siteFontWeightSelect = document.getElementById('site-font-weight-select');
+    const siteFontColorPicker = document.getElementById('site-font-color-picker');
+    const siteBgColorPicker = document.getElementById('site-bg-color-picker');
     const resetSiteColorButton = document.getElementById('reset-site-color');
+    const siteGradientEnable = document.getElementById('site-gradient-enable');
+    const gradientOptionsContainer = document.getElementById('gradient-options-container');
+    const siteGradientColor1 = document.getElementById('site-gradient-color1');
+    const siteGradientColor2 = document.getElementById('site-gradient-color2');
+    const siteGradientAngle = document.getElementById('site-gradient-angle');
+    const siteBorderWidthInput = document.getElementById('site-border-width-input');
+    const siteBorderStyleSelect = document.getElementById('site-border-style-select');
+    const siteBorderColorPicker = document.getElementById('site-border-color-picker');
+    const siteBorderRadiusInput = document.getElementById('site-border-radius-input');
+    const siteAnimationSelect = document.getElementById('site-animation-select');
+    const siteHoverSelect = document.getElementById('site-hover-select');
     const saveSiteSettingsButton = document.getElementById('save-site-settings');
     const resetSiteSettingsButton = document.getElementById('reset-site-settings');
     const domainListUl = document.getElementById('domain-list');
     const resetAllSettingsButton = document.getElementById('reset-all-settings');
     const statusMessageP = document.getElementById('status-message');
     const currentSiteSettingsSection = document.querySelector('.current-site-settings');
+
+    // All configurable inputs for enabling/disabling
+    const siteConfigInputs = [
+        siteLabelInput, sitePositionSelect, siteShapeSelect, siteSizeWidthInput, siteSizeHeightInput,
+        siteOpacityInput, siteFontSizeInput, siteFontWeightSelect, siteFontColorPicker,
+        siteBgColorPicker, resetSiteColorButton, siteGradientEnable, siteGradientColor1,
+        siteGradientColor2, siteGradientAngle, siteBorderWidthInput, siteBorderStyleSelect,
+        siteBorderColorPicker, siteBorderRadiusInput, siteAnimationSelect, siteHoverSelect
+    ];
 
     let settings = {};
     let currentDomain = null;
@@ -58,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateDomainList() {
         domainListUl.innerHTML = ''; // Clear existing list
-        const sortedDomains = Object.keys(settings.domains).sort();
+        const sortedDomains = Object.keys(settings.domains || {}).sort();
 
         if (sortedDomains.length === 0) {
              domainListUl.innerHTML = '<li>No sites configured yet.</li>';
@@ -76,11 +105,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const colorPreview = document.createElement('span');
             colorPreview.className = 'domain-color-preview';
-            const bgColor = domainConfig.color || getDefaultColor(domain);
-            colorPreview.style.backgroundColor = bgColor;
-            // Set border color based on contrast for better visibility
-            const borderColor = getContrastYIQ(bgColor) === '#fff' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.2)';
-            colorPreview.style.borderColor = borderColor;
+            const bgColor = (domainConfig.background?.gradient?.enabled)
+                            ? `linear-gradient(${domainConfig.background.gradient.angle || 0}deg, ${domainConfig.background.gradient.color1 || '#ccc'}, ${domainConfig.background.gradient.color2 || '#eee'})`
+                            : (domainConfig.background?.color || getDefaultColor(domain));
+
+            colorPreview.style.backgroundColor = domainConfig.background?.color || getDefaultColor(domain);
+            colorPreview.style.border = `${domainConfig.border?.width || 0}px ${domainConfig.border?.style || 'solid'} ${domainConfig.border?.color || 'transparent'}`;
+            colorPreview.style.borderRadius = domainConfig.border?.radius || '0';
+
+            const contrastBorderColor = getContrastYIQ(colorPreview.style.backgroundColor) === '#fff' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.2)';
+            colorPreview.style.borderColor = contrastBorderColor;
 
             const domainNameSpan = document.createElement('span');
             domainNameSpan.className = 'domain-name';
@@ -88,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const domainLabelSpan = document.createElement('span');
             domainLabelSpan.className = 'domain-label';
-            domainLabelSpan.textContent = `(${domainConfig.enabled ? 'Enabled' : 'Disabled'}, Label: ${domainConfig.label || getDefaultLabel(domain)})`;
+            domainLabelSpan.textContent = `(${domainConfig.enabled ? 'Enabled' : 'Disabled'}, ${domainConfig.label || getDefaultLabel(domain)})`;
 
             domainInfoDiv.appendChild(colorPreview);
             domainInfoDiv.appendChild(domainNameSpan);
@@ -129,20 +163,78 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadCurrentSiteSettings(domain) {
-        const domainConfig = settings.domains[domain] || {};
-        siteEnableSwitch.checked = domainConfig.enabled === undefined ? false : domainConfig.enabled; // Default to false if never set
-        siteLabelInput.value = domainConfig.label || ''; // Show empty if no custom label
-        siteColorPicker.value = domainConfig.color || getDefaultColor(domain);
+        const savedDomainConfig = settings.domains?.[domain];
+        const defaultDomainConfig = getDefaultDomainConfig(domain);
 
-        // Disable inputs if site is not explicitly enabled
+        // *** Refined: Deep merge defaults and saved config for UI population ***
+        const displayConfig = {
+            ...defaultDomainConfig,
+            ...(savedDomainConfig || {}),
+            size: { ...defaultDomainConfig.size, ...(savedDomainConfig?.size || {}) },
+            font: { ...defaultDomainConfig.font, ...(savedDomainConfig?.font || {}) },
+            background: {
+                ...defaultDomainConfig.background,
+                ...(savedDomainConfig?.background || {}),
+                gradient: {
+                    ...defaultDomainConfig.background.gradient,
+                    ...(savedDomainConfig?.background?.gradient || {})
+                }
+            },
+            border: { ...defaultDomainConfig.border, ...(savedDomainConfig?.border || {}) },
+            effects: { ...defaultDomainConfig.effects, ...(savedDomainConfig?.effects || {}) },
+            // Get enabled status specifically from saved if it exists, else false
+            enabled: savedDomainConfig?.enabled ?? false
+        };
+
+
+        // Use merged config to populate UI
+        siteEnableSwitch.checked = displayConfig.enabled;
+
+        // Populate General
+        siteLabelInput.value = displayConfig.label === getDefaultLabel(domain) ? '' : displayConfig.label; // Show placeholder if default
+        sitePositionSelect.value = displayConfig.position;
+        siteShapeSelect.value = displayConfig.shape;
+        siteSizeWidthInput.value = displayConfig.size.width;
+        siteSizeHeightInput.value = displayConfig.size.height;
+        siteOpacityInput.value = displayConfig.opacity;
+        opacityValueSpan.textContent = parseFloat(displayConfig.opacity).toFixed(2);
+
+        // Populate Font
+        siteFontSizeInput.value = displayConfig.font.size;
+        siteFontWeightSelect.value = displayConfig.font.weight;
+        siteFontColorPicker.value = displayConfig.font.color;
+
+        // Populate Background
+        siteBgColorPicker.value = displayConfig.background.color;
+        siteGradientEnable.checked = displayConfig.background.gradient.enabled;
+        siteGradientColor1.value = displayConfig.background.gradient.color1;
+        siteGradientColor2.value = displayConfig.background.gradient.color2;
+        siteGradientAngle.value = displayConfig.background.gradient.angle;
+        gradientOptionsContainer.style.display = displayConfig.background.gradient.enabled ? 'block' : 'none';
+
+        // Populate Border
+        siteBorderWidthInput.value = displayConfig.border.width;
+        siteBorderStyleSelect.value = displayConfig.border.style;
+        siteBorderColorPicker.value = displayConfig.border.color;
+        siteBorderRadiusInput.value = displayConfig.border.radius;
+
+        // Populate Effects
+        siteAnimationSelect.value = displayConfig.effects.animation;
+        siteHoverSelect.value = displayConfig.effects.hover;
+
         updateSiteInputStates();
     }
 
     function updateSiteInputStates() {
          const enabled = siteEnableSwitch.checked;
-         siteLabelInput.disabled = !enabled;
-         siteColorPicker.disabled = !enabled;
-         resetSiteColorButton.disabled = !enabled;
+         siteConfigInputs.forEach(input => {
+             input.disabled = !enabled;
+         });
+         // Special handling for gradient options based on its own checkbox
+         const gradientEnabled = siteGradientEnable.checked && enabled;
+         siteGradientColor1.disabled = !gradientEnabled;
+         siteGradientColor2.disabled = !gradientEnabled;
+         siteGradientAngle.disabled = !gradientEnabled;
     }
 
     // --- Event Handlers ---
@@ -160,9 +252,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     siteEnableSwitch.addEventListener('change', updateSiteInputStates);
 
+    // Listener for opacity slider
+    siteOpacityInput.addEventListener('input', (event) => {
+        opacityValueSpan.textContent = parseFloat(event.target.value).toFixed(2);
+    });
+
+    // Listener for gradient enable checkbox
+    siteGradientEnable.addEventListener('change', (event) => {
+        gradientOptionsContainer.style.display = event.target.checked ? 'block' : 'none';
+        updateSiteInputStates(); // Re-evaluate disabled state of gradient inputs
+    });
+
     resetSiteColorButton.addEventListener('click', () => {
         if (currentDomain) {
-            siteColorPicker.value = getDefaultColor(currentDomain);
+            const defaultColor = getDefaultColor(currentDomain);
+            siteBgColorPicker.value = defaultColor;
+            // Also reset gradient color 1 if gradient is enabled
+            if (siteGradientEnable.checked) {
+                siteGradientColor1.value = defaultColor;
+            }
         }
     });
 
@@ -170,39 +278,68 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentDomain) return;
 
         const isEnabled = siteEnableSwitch.checked;
-        const newLabel = siteLabelInput.value.trim();
-        const newColor = siteColorPicker.value;
+        const defaultConf = getDefaultDomainConfig(currentDomain);
 
-        // Keep a copy of the potentially modified settings object for the current domain
-        const potentialDomainSettings = {
+        // *** Refined: Construct config using defaults for empty/invalid inputs ***
+        const currentDomainConfig = {
             enabled: isEnabled,
-            label: newLabel === '' ? null : newLabel, // Store null if empty to use default
-            color: newColor === getDefaultColor(currentDomain) ? null : newColor // Store null if default
+            label: siteLabelInput.value.trim() || defaultConf.label,
+            position: sitePositionSelect.value,
+            shape: siteShapeSelect.value,
+            size: {
+                width: siteSizeWidthInput.value.trim() || defaultConf.size.width,
+                height: siteSizeHeightInput.value.trim() || defaultConf.size.height
+            },
+            opacity: parseFloat(siteOpacityInput.value) || defaultConf.opacity,
+            font: {
+                family: 'sans-serif', // Hardcoded for now
+                size: siteFontSizeInput.value.trim() || defaultConf.font.size,
+                weight: siteFontWeightSelect.value,
+                color: siteFontColorPicker.value
+            },
+            background: {
+                color: siteBgColorPicker.value,
+                gradient: {
+                    enabled: siteGradientEnable.checked,
+                    color1: siteGradientColor1.value,
+                    color2: siteGradientColor2.value,
+                    // Ensure angle is a number, default if invalid
+                    angle: parseInt(siteGradientAngle.value, 10) || defaultConf.background.gradient.angle
+                }
+            },
+            border: {
+                // Ensure width is a number, default if invalid
+                width: parseInt(siteBorderWidthInput.value, 10) >= 0 ? parseInt(siteBorderWidthInput.value, 10) : defaultConf.border.width,
+                style: siteBorderStyleSelect.value,
+                color: siteBorderColorPicker.value,
+                radius: siteBorderRadiusInput.value.trim() || defaultConf.border.radius
+            },
+            effects: {
+                animation: siteAnimationSelect.value,
+                hover: siteHoverSelect.value
+            }
         };
 
-        // Only create/update the domain entry if it's enabled or was previously configured
-        if (isEnabled || settings.domains[currentDomain]) {
-             // Clean up entry if disabled and has no custom settings
-            if (!isEnabled && potentialDomainSettings.label === null && potentialDomainSettings.color === null) {
-                 if (settings.domains[currentDomain]) {
-                    delete settings.domains[currentDomain];
-                 }
-                 // If it wasn't previously configured and is disabled, we don't add it below.
-            } else {
-                settings.domains[currentDomain] = potentialDomainSettings;
-            }
+        // Logic: Save if enabled, delete if disabled
+        if (isEnabled) {
+            settings.domains = settings.domains || {};
+            settings.domains[currentDomain] = currentDomainConfig;
         } else {
-            // If the site was never configured and is being saved in a disabled state, do nothing.
-            showStatus("Enable the tag first to save settings.", "error");
-            return;
+            if (settings.domains && settings.domains[currentDomain]) {
+                delete settings.domains[currentDomain];
+                showStatus("Tag disabled and settings removed for this site.", "info");
+            } else {
+                 // If it wasn't enabled and wasn't saved, do nothing.
+                 showStatus("Tag not enabled. No settings saved.", "info");
+                 return; // Exit early, no need to save/update
+            }
         }
 
-        // Make a deep copy to avoid potential issues if the settings object is mutated elsewhere
         const settingsToSave = JSON.parse(JSON.stringify(settings));
 
         saveSettingsAndUpdate(settingsToSave).then(() => {
             showStatus("Site settings saved!");
-            populateDomainList(); // Update the list immediately
+            populateDomainList();
 
             // --- START IMMEDIATE UPDATE --- 
             // Directly notify the current active tab to update its tag instantly
@@ -235,12 +372,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     resetSiteSettingsButton.addEventListener('click', () => {
-        if (!currentDomain || !settings.domains[currentDomain]) return; // Nothing to reset
+        if (!currentDomain) return; // Check currentDomain first
+        const domainExists = settings.domains?.[currentDomain]; // Check if exists
+        if (!domainExists) {
+            showStatus(`No settings saved for ${currentDomain} to reset.`, "info");
+            return; // Nothing to reset
+        }
 
-        if (confirm(`Are you sure you want to reset settings for ${currentDomain}?`)) {
+        if (confirm(`Are you sure you want to reset all customizations for ${currentDomain}? The tag will be disabled.`)) {
             delete settings.domains[currentDomain];
-            saveSettingsAndUpdate(settings).then(() => {
-                loadCurrentSiteSettings(currentDomain); // Reload inputs for current site
+            const settingsToSave = JSON.parse(JSON.stringify(settings));
+            saveSettingsAndUpdate(settingsToSave).then(() => {
+                loadCurrentSiteSettings(currentDomain); // Reload inputs for current site (will show defaults)
                 populateDomainList();
                 showStatus(`Settings for ${currentDomain} reset.`);
             }).catch(err => {
@@ -251,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function handleDeleteDomain(domain) {
-        if (!settings.domains[domain]) return;
+        if (!settings.domains?.[domain]) return; // Check existence safely
 
         // Confirmation is good practice
         if (confirm(`Are you sure you want to remove all settings for ${domain}?`)) {

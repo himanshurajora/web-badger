@@ -19,8 +19,7 @@
     {
       "matches": ["<all_urls>"],
       "js": ["src/common/utils.js", "src/content/content.js"],
-      "css": ["src/content/content.css"],
-      "run_at": "document_start"
+      "css": ["src/content/content.css"]
     }
   ],
   "action": {

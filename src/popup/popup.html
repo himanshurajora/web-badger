@@ -30,15 +30,147 @@
                 <label for="site-enable-switch">Enable Tag for this Site</label>
                 <input type="checkbox" id="site-enable-switch">
             </div>
-            <div class="setting-item">
-                <label for="site-label-input">Custom Label</label>
-                <input type="text" id="site-label-input" placeholder="Default (e.g., EX)">
-            </div>
-            <div class="setting-item">
-                <label for="site-color-picker">Tag Color</label>
-                <input type="color" id="site-color-picker">
-                <button id="reset-site-color" class="button-secondary">Reset Color</button>
-            </div>
+
+            <!-- Collapsible Sections for Customization -->
+            <details class="config-section">
+                <summary>General</summary>
+                <div class="setting-item">
+                    <label for="site-label-input">Label</label>
+                    <input type="text" id="site-label-input" placeholder="Default (e.g., EX)">
+                </div>
+                <div class="setting-item">
+                    <label for="site-position-select">Position</label>
+                    <select id="site-position-select">
+                        <option value="top-left">Top Left</option>
+                        <option value="top-right">Top Right</option>
+                        <option value="bottom-left">Bottom Left</option>
+                        <option value="bottom-right">Bottom Right</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="site-shape-select">Shape</label>
+                    <select id="site-shape-select">
+                        <option value="rectangle">Rectangle</option>
+                        <option value="pill">Pill</option>
+                        <option value="circle">Circle</option>
+                    </select>
+                </div>
+                <div class="setting-item size-inputs">
+                    <label>Size</label>
+                    <div>
+                        <input type="text" id="site-size-width" placeholder="Width (auto, px, em)">
+                        <span>&times;</span>
+                        <input type="text" id="site-size-height" placeholder="Height (auto, px, em)">
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label for="site-opacity-input">Opacity</label>
+                    <input type="range" id="site-opacity-input" min="0" max="1" step="0.05">
+                    <span class="range-value" id="opacity-value">1.0</span>
+                </div>
+            </details>
+
+            <details class="config-section">
+                <summary>Font</summary>
+                <!-- Optional: Font Family Select -->
+                <!-- <div class="setting-item">
+                    <label for="site-font-family-select">Font Family</label>
+                    <select id="site-font-family-select">
+                        <option value="sans-serif">Sans-serif</option>
+                        <option value="serif">Serif</option>
+                        <option value="monospace">Monospace</option>
+                    </select>
+                </div> -->
+                <div class="setting-item">
+                    <label for="site-font-size-input">Size</label>
+                    <input type="text" id="site-font-size-input" placeholder="e.g., 12px, 1em">
+                </div>
+                <div class="setting-item">
+                    <label for="site-font-weight-select">Weight</label>
+                    <select id="site-font-weight-select">
+                        <option value="normal">Normal</option>
+                        <option value="bold">Bold</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="site-font-color-picker">Color</label>
+                    <input type="color" id="site-font-color-picker" value="#ffffff">
+                </div>
+            </details>
+
+            <details class="config-section">
+                <summary>Background</summary>
+                <div class="setting-item">
+                    <label for="site-bg-color-picker">Color</label>
+                    <input type="color" id="site-bg-color-picker">
+                    <button id="reset-site-color" class="button-secondary button-small">Reset Default</button>
+                </div>
+                <div class="setting-item gradient-toggle">
+                    <label for="site-gradient-enable">Enable Gradient</label>
+                    <input type="checkbox" id="site-gradient-enable">
+                </div>
+                <div class="gradient-options" id="gradient-options-container" style="display: none;">
+                    <div class="setting-item">
+                        <label for="site-gradient-color1">Color 1</label>
+                        <input type="color" id="site-gradient-color1">
+                    </div>
+                    <div class="setting-item">
+                        <label for="site-gradient-color2">Color 2</label>
+                        <input type="color" id="site-gradient-color2">
+                    </div>
+                    <div class="setting-item">
+                        <label for="site-gradient-angle">Angle (°)</label>
+                        <input type="number" id="site-gradient-angle" min="0" max="360" step="1" value="45">
+                    </div>
+                </div>
+            </details>
+
+            <details class="config-section">
+                <summary>Border</summary>
+                 <div class="setting-item">
+                    <label for="site-border-width-input">Width (px)</label>
+                    <input type="number" id="site-border-width-input" min="0" step="1" value="0">
+                </div>
+                 <div class="setting-item">
+                    <label for="site-border-style-select">Style</label>
+                    <select id="site-border-style-select">
+                        <option value="none">None</option>
+                        <option value="solid">Solid</option>
+                        <option value="dashed">Dashed</option>
+                        <option value="dotted">Dotted</option>
+                    </select>
+                </div>
+                 <div class="setting-item">
+                    <label for="site-border-color-picker">Color</label>
+                    <input type="color" id="site-border-color-picker" value="#000000">
+                </div>
+                 <div class="setting-item">
+                    <label for="site-border-radius-input">Radius</label>
+                    <input type="text" id="site-border-radius-input" placeholder="e.g., 3px, 50%">
+                </div>
+            </details>
+
+             <details class="config-section">
+                <summary>Effects</summary>
+                <div class="setting-item">
+                    <label for="site-animation-select">Entrance Animation</label>
+                    <select id="site-animation-select">
+                        <option value="none">None</option>
+                        <option value="fade-in">Fade In</option>
+                        <option value="slide-in">Slide In</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="site-hover-select">Hover Effect</label>
+                    <select id="site-hover-select">
+                        <option value="none">None</option>
+                        <option value="move-opposite-corner">Move Opposite Corner</option>
+                        <option value="change-opacity">Change Opacity (0.7)</option>
+                        <option value="grow">Grow (1.1x)</option>
+                    </select>
+                </div>
+            </details>
+
              <button id="save-site-settings" class="button-primary">Save Site Settings</button>
              <button id="reset-site-settings" class="button-secondary">Reset Site</button>
              <p id="status-message" class="status-message"></p>

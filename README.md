@@ -5,10 +5,19 @@ Helps distinguish between different environments (e.g., dev, staging, prod) or s
 
 ## Features
 
-*   Adds a colored tag to the top-left of configured web pages.
+*   Adds a customizable colored tag to configured web pages.
 *   Globally enable/disable the extension.
 *   Enable/disable tags on a per-domain basis.
-*   Customize tag color and label for each domain.
+*   **Extensive Customization (per domain):**
+    *   **Label**: Set custom text (e.g., DEV, STAGE).
+    *   **Position**: Choose corner (top-left, top-right, bottom-left, bottom-right).
+    *   **Shape**: Select shape (rectangle, pill, circle).
+    *   **Size**: Define width and height.
+    *   **Opacity**: Control tag transparency.
+    *   **Font**: Customize family (optional), size, weight, and color.
+    *   **Background**: Set solid color or apply linear gradients.
+    *   **Border**: Configure width, style, color, and radius.
+    *   **Effects**: Add entrance animations (fade-in, slide-in) and hover effects (move-opposite-corner, change-opacity, grow).
 *   Automatic default color generation based on domain name.
 *   Automatic default label generation (first 2 letters of domain).
 *   Dark/Light mode support for the popup configuration.
@@ -21,13 +30,17 @@ Helps distinguish between different environments (e.g., dev, staging, prod) or s
 2.  Click the extension icon in your browser toolbar to open the configuration popup.
 3.  The popup shows settings for the **current website** you are visiting.
 4.  **Enable Tag for this Site**: Check this box to activate the tag for the current domain.
-5.  **Customize Label**: Enter a short text label (e.g., DEV, STAGE, PROD).
-6.  **Customize Color**: Pick a color for the tag.
-7.  Click **Save Site Settings**.
-8.  The tag should now appear on the website (you might need to refresh the page).
-9.  Use the **Global Settings** toggle to turn the entire extension on or off.
-10. Manage all your configured sites under the **Configured Sites** section.
-11. Use the **Reset** buttons carefully!
+5.  **Customize**: Expand the sections (General, Font, Border, Effects) to configure:
+    *   Label, Position, Shape, Size, Opacity.
+    *   Font Size, Weight, Color.
+    *   Background Color and Gradient options.
+    *   Border Width, Style, Color, Radius.
+    *   Entrance Animation and Hover Effect.
+6.  Click **Save Site Settings**.
+7.  The tag should now appear on the website (you might need to refresh the page).
+8.  Use the **Global Settings** toggle to turn the entire extension on or off.
+9.  Manage all your configured sites under the **Configured Sites** section.
+10. Use the **Reset** buttons carefully!
 
 ## Development
 
